@@ -10,6 +10,8 @@ public class GameVariable
     public float CO2Emission;
     public float scalingFactor;
     public float maxValue;
+    public float changeValue;
+    public List<Action> actions;
 
 
     public GameVariable(string _name, string _unit, float _value, float _CO2Emission, float _scalingFactor = 1, float _maxValue = 0) 
@@ -20,6 +22,7 @@ public class GameVariable
         CO2Emission = _CO2Emission;
         scalingFactor = _scalingFactor;
         maxValue = _maxValue;
+        changeValue = _value;
 
     }
 
@@ -30,25 +33,45 @@ public class GameVariable
 
     public void ChangeValue(float amount, bool checkMax = false)
     {
-        if(checkMax)
+        /*if(checkMax)
         {
             if ((value+amount) > maxValue) 
             {
                 return;
             }
-        }
+        }*/
         value += amount;
     }
 
-    public float GetChangedValue(float amount, bool checkMax = false)
+    public void SetChangedValue(float amount, bool checkMax = false)
     {
-        if (checkMax)
+        changeValue += amount;
+    }
+
+    public bool UpdateCurrentValue(bool checkMax = false)
+    {
+        if (changeValue > 0)
         {
-            if ((value + amount) > maxValue)
+            if (checkMax)
             {
-                return value;
+                if(changeValue > maxValue)
+                {
+                    return false;
+                }
+                else
+                {
+                    value = changeValue;
+                    changeValue = 0;
+                    return true;
+                }
+            }
+            else
+            {
+                value = changeValue;
+                changeValue = 0;
+                return true;
             }
         }
-        return value + amount;
+        return false;
     }
 }

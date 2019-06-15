@@ -14,13 +14,17 @@ public class ToggleButton : MonoBehaviour
     public void ButtonToggled ()
     //Toggles the button on if it's off an visa versa. Also handles changing the sprites.
     {
+        int actionId = int.Parse(transform.name.Substring(7));
+
         if (toggled)
         {
+            VariablesHelper.actions[actionId].CalculateActionChanges(-1);
             toggled = false;
             GetComponent<Image>().sprite = untoggledSprite;
         }
         else
         {
+            VariablesHelper.actions[actionId].CalculateActionChanges();
             toggled = true;
             GetComponent<Image>().sprite = toggledSprite;
         }

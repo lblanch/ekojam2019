@@ -6,9 +6,9 @@ using UnityEngine;
 public class Action
 {
     public string description;
-    List<Tuple<int,float>> variableActions = new List<Tuple<int,float>>();
-    List<Tuple<int, int>> groupActions = new List<Tuple<int, int>>();
-    List<Tuple<int,float>> groupAmounts = new List<Tuple<int,float>>();
+    List<Tuple<int,float>> variableActions = new List<Tuple<int,float>>(); //variableId and amount
+    List<Tuple<int, int>> groupActions = new List<Tuple<int, int>>(); //sourceId and destinationId
+    List<Tuple<int,float>> groupAmounts = new List<Tuple<int,float>>(); //groupId and amount
 
     public Action(string _description)
     {
@@ -39,23 +39,35 @@ public class Action
         }
     }
 
-    public string GetActionChanges()
+    public void CalculateActionChanges(int toggle = 1)
     {
-        string returnStr = "";
-        Tuple<float, float> aux;
-
         foreach (Tuple<int, float> actionVar in variableActions)
         {
-            returnStr += VariablesHelper.baseVariables[actionVar.Item1].name + ": " + VariablesHelper.baseVariables[actionVar.Item1].GetChangedValue(actionVar.Item2) + "\n";
+            VariablesHelper.baseVariables[actionVar.Item1].SetChangedValue(toggle * actionVar.Item2);
         }
 
         for (int i = 0; i < groupActions.Count; i++)
         {
-            aux = VariablesHelper.groupVariables[groupAmounts[i].Item1].GetChangedValues(groupAmounts[i].Item2, groupActions[i].Item1, groupActions[i].Item2);
-            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item1].name + ": " + aux.Item1 + "\n";
-            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item2].name + ": " + aux.Item2 + "\n";
+            VariablesHelper.groupVariables[groupAmounts[i].Item1].SetChangedValues(toggle * groupAmounts[i].Item2, groupActions[i].Item1, groupActions[i].Item2);
+        }
+    }
+
+    public string ActionsToString()
+    {
+        string returnStr = "";
+
+        foreach (Tuple<int, float> actionVar in variableActions)
+        {
+            returnStr += VariablesHelper.baseVariables[actionVar.Item1].name + ": +" + actionVar.Item2 + "\n";
+        }
+
+        for (int i = 0; i < groupActions.Count; i++)
+        {
+            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item1].name + ": +" + groupAmounts[i].Item2 + "\n";
+            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item2].name + ": -" + groupAmounts[i].Item2 + "\n";
 
         }
         return returnStr;
     }
+
 }

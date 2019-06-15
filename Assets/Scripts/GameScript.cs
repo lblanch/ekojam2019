@@ -8,6 +8,7 @@ public class GameScript : MonoBehaviour
 
     public GameObject ActionButtonPrefab;
     public Text textAllVariables;
+    public Text textAllChanges;
 
     // Start is called before the first frame update
     void Start()
@@ -23,26 +24,38 @@ public class GameScript : MonoBehaviour
             newButton.transform.SetParent(GameObject.Find("Choices").transform, false);
             newButton.name = "action_"+i;
             //TODO Store the actionId somewhere in the button object, if possible
-            newButton.GetComponentInChildren<Text>().text = VariablesHelper.actions[i].description;
+            //TODO Adjust button height to fit all text
+            newButton.GetComponentInChildren<Text>().text = VariablesHelper.actions[i].description + "\n" + VariablesHelper.actions[i].ActionsToString();
 
-            //TODO find a way to programatically get the height of the button (now using just 20)
+            //TODO find a way to programatically get the height of the button
             //newButton.GetComponent<RectTransform>().rect.size.y doesn't seem to take the objects scaling
-            newButton.transform.position = newButton.transform.position + new Vector3(0, i * 20, 0);
+            newButton.transform.position = newButton.transform.position + new Vector3(0, i * 60, 0);
         }
     }
 
 
     void FixedUpdate()
     {
-        textAllVariables.text = "";
+        textAllVariables.text = "CURRENT STATS\n\n";
         foreach (GameVariable var in VariablesHelper.baseVariables)
         {
-            textAllVariables.text += "- " + var.name + " " + var.value + var.unit + " \n";
+            textAllVariables.text += "- " + var.name + " " + var.value + " " + var.unit + "\n";
         }
         foreach (GamePercentGroup var in VariablesHelper.groupVariables)
         {
             foreach (GameVariable varVar in var.variables)
-                textAllVariables.text += "- " + varVar.name + " " + varVar.value + varVar.unit + " \n";
+                textAllVariables.text += "- " + varVar.name + " " + varVar.value + " " + varVar.unit + "\n";
+        }
+
+        textAllChanges.text = "AFTER CHANGES STATS\n\n";
+        foreach (GameVariable var in VariablesHelper.baseVariables)
+        {
+            textAllChanges.text += "- " + var.name + " " + var.changeValue + " " +  var.unit + "\n";
+        }
+        foreach (GamePercentGroup var in VariablesHelper.groupVariables)
+        {
+            foreach (GameVariable varVar in var.variables)
+                textAllChanges.text += "- " + varVar.name + " " + varVar.changeValue + " " + varVar.unit + "\n";
         }
     }
 
@@ -50,6 +63,9 @@ public class GameScript : MonoBehaviour
     {
         int actionId;
 
+        //This way goes through all toggled buttons and executes their actions in order
+        /*
+        //TODO if changedValue is negative or not acceptable, show message and cancel this action
         GameObject.Find("Choices").GetComponentInChildren<Button>(false);
         foreach (Button actionButton in GameObject.Find("Choices").GetComponentsInChildren<Button>(false))
         {
@@ -58,7 +74,33 @@ public class GameScript : MonoBehaviour
                 actionId = int.Parse(actionButton.transform.name.Substring(7));
                 VariablesHelper.actions[actionId].ExecuteAction();
             }
+        }*/
+
+        //TODO THIS BELOW IS WRONG: IF THE VARIABLE WITH THE WRONG AMOUNT IS THE LAST ONE, THE PREVIOUS CHANGES ARE NOT UNDONE!
+        //In this way we go through all our variables and simply take the already calculated value as current
+        foreach (GameVariable var in VariablesHelper.baseVariables)
+        {
+            if(!var.UpdateCurrentValue())
+            {
+                //TODO show this message to the user in a pop up window or something
+                Debug.Log(var.name + " With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
+                return;
+            }
         }
+        foreach (GamePercentGroup var in VariablesHelper.groupVariables)
+        {
+            foreach (GameVariable varVar in var.variables)
+            {
+                if (!varVar.UpdateCurrentValue(true))
+                {
+                    //TODO show this message to the user in a pop up window or something
+                    Debug.Log(varVar.name + "With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
+                    return;
+                }
+
+            }
+        }
+
     }
 
     void LoadData()
@@ -105,6 +147,4 @@ public class GameScript : MonoBehaviour
         auxAction.AddVariableAction(0, 4000);
         VariablesHelper.actions.Add(auxAction);
     }
-
-
 }
