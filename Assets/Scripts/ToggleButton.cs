@@ -25,4 +25,9 @@ public class ToggleButton : MonoBehaviour
             GetComponent<Image>().sprite = toggledSprite;
         }
     }
+
+    public bool IsToggled()
+    {
+        return toggled;
+    }
 }

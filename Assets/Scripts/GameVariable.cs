@@ -23,12 +23,12 @@ public class GameVariable
 
     }
 
-    public float calculateCO2()
+    public float CalculateCO2()
     {
         return value * CO2Emission * scalingFactor;
     }
 
-    public void changeValue(float amount, bool checkMax = false)
+    public void ChangeValue(float amount, bool checkMax = false)
     {
         if(checkMax)
         {
@@ -38,5 +38,17 @@ public class GameVariable
             }
         }
         value += amount;
+    }
+
+    public float GetChangedValue(float amount, bool checkMax = false)
+    {
+        if (checkMax)
+        {
+            if ((value + amount) > maxValue)
+            {
+                return value;
+            }
+        }
+        return value + amount;
     }
 }
