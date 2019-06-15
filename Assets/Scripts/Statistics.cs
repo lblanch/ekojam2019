@@ -12,7 +12,7 @@ public class Statistics : MonoBehaviour
     /// <summary> Value is shown in UI and is updated to match CO2AmountYearlyInKilotons. Win condition to lower this to 0. About -5k to 50k range.</summary>
     public Slider CO2Slider;
     /// <summary> Calculated from other info regularly. Finland, for example, produces is 47 Megatons of Co2 equivalent.</summary>
-    private float CO2AmountYearlyInKilotons;
+    public float CO2AmountYearlyInKilotons;
     /// <summary> Individual UI element change speeds need to be calibrated later to sensible values. </summary>
     private float CO2ChangeSpeedInUI = 1f;
 
