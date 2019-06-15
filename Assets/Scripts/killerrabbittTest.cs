@@ -5,48 +5,68 @@ using UnityEngine.UI;
 
 public class killerrabbittTest : MonoBehaviour
 {
-    float CO2;
-    float population;
-    float food;
-    Land landOfKingdom;
-    Energy energyOfKingdrom;
     List<Action> actions = new List<Action>();
     public Text textARG;
 
     // Start is called before the first frame update
     void Start()
     {
-        CO2 = 2000;
-        population = 500;
-        food = 6000;
+        GameVariable auxVar;
+        GamePercentGroup auxGroup;
+        Action auxAction;
 
-        //Initialize land
-        landOfKingdom = new Land(30, 20);
+        auxVar = new GameVariable("CO2", "kilotons", 2000, 0);
+        VariablesHelper.baseVariables.Add(auxVar);
+        auxVar = new GameVariable("Population", "persons", 500, 200);
+        VariablesHelper.baseVariables.Add(auxVar);
+        auxVar = new GameVariable("Food", "kg", 60000, 0);
+        VariablesHelper.baseVariables.Add(auxVar);
 
-        //Initialize energy
-        energyOfKingdrom = new Energy(20);
+        auxGroup = new GamePercentGroup();
+        auxVar = new GameVariable("City Land", "m2", 30, 400, 1, 100);
+        auxGroup.AddToGroup(auxVar);
+        auxVar = new GameVariable("Farming Land", "m2", 30, 600, 1, 100);
+        auxGroup.AddToGroup(auxVar);
+        auxVar = new GameVariable("Forest", "m2", 40, -2000, 1, 100);
+        auxGroup.AddToGroup(auxVar);
+        VariablesHelper.groupVariables.Add(auxGroup);
 
         //add actions to action vector
-        Action auxAction = new Action("Increase city land", 0, 20, 0);
+        auxAction = new Action("Increase city land");
+        auxAction.AddGroupAction(0, 2, 0, 20);
         actions.Add(auxAction);
-        auxAction = new Action("Add farming land", 10, 0, 0);
+
+        auxAction = new Action("Add farming land");
+        auxAction.AddGroupAction(0, 2, 1, 10);
         actions.Add(auxAction);
-        auxAction = new Action("Turn farming land to forest", 0, 0, 30);
+
+        auxAction = new Action("Turn farming land to forest");
+        auxAction.AddGroupAction(0, 1, 2, 30);
         actions.Add(auxAction);
-        auxAction = new Action("Increase farming and city land", 10, 20, 0);
+
+        auxAction = new Action("Increase farming and city land");
+        auxAction.AddGroupAction(0, 2, 1, 40);
+        auxAction.AddGroupAction(0, 2, 0, 20);
+        actions.Add(auxAction);
+
+        auxAction = new Action("Just randomly increase CO2");
+        auxAction.AddVariableAction(0, 4000);
         actions.Add(auxAction);
     }
 
 
     void FixedUpdate()
     {
-        textARG.text = "City: " + landOfKingdom.city + "%\n" +
-                        "Forest: " + landOfKingdom.forest + "%\n" +
-                        "Farming: " + landOfKingdom.farming + "%\n" +
-                        "CO2: " + CO2 + "%\n" +
-                        "population: " + population + "%\n" +
-                        "Food: " + food + "%\n";
-
+        textARG.text = "";
+        foreach (GameVariable var in VariablesHelper.baseVariables)
+        {
+            textARG.text += var.name + " " + var.value + var.unit + "\n";
+        }
+        foreach (GamePercentGroup var in VariablesHelper.groupVariables)
+        {
+            foreach (GameVariable varVar in var.variables)
+                textARG.text += varVar.name + " " + varVar.value + varVar.unit + "\n";
+        }
     }
 
     public void OnClickButton()
@@ -55,18 +75,7 @@ public class killerrabbittTest : MonoBehaviour
         foreach (Action playerAction in actions)
         {
             Debug.Log("Executing: " + playerAction.description);
-            if(playerAction.cityLand >= 0)
-            {
-                landOfKingdom.IncreaseCityLand(playerAction.cityLand);
-            }
-            if (playerAction.forestLand >= 0)
-            {
-                landOfKingdom.IncreaseForest(playerAction.forestLand);
-            }
-            if (playerAction.farmingLand >= 0)
-            {
-                landOfKingdom.IncreaseFarming(playerAction.farmingLand);
-            }
+            playerAction.ExecuteAction();
         }
     }
 }
