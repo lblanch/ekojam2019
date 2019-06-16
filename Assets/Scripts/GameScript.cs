@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -80,13 +81,6 @@ public class GameScript : MonoBehaviour
         string cycleActions = "Cycle actions: ";
         string consequences = "Consequences: ";
         Tuple<bool, string> auxTuple;
-
-        /*if(!varValuesAreOk)
-        {
-            //TODO show this message to the user in a pop up window or something
-            Debug.Log(" With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
-            return;
-        }*/
        
         //execute all actions and delete buttons
         GameObject.Find("Choices").GetComponentInChildren<Button>(false);
@@ -125,7 +119,6 @@ public class GameScript : MonoBehaviour
             if(auxTuple.Item1)
             {
                 //GAME OVER
-                //TODO to to game over scene
                 VariablesHelper.gameOver = auxTuple.Item2;
                 UnityEngine.SceneManagement.SceneManager.LoadScene("LoosEndSccene");
                 return;
@@ -143,7 +136,6 @@ public class GameScript : MonoBehaviour
                 if (auxTuple.Item1)
                 {
                     //GAME OVER
-                    //TODO to to game over scene
                     VariablesHelper.gameOver = auxTuple.Item2;
                     UnityEngine.SceneManagement.SceneManager.LoadScene("LoosEndSccene");
                     return;
@@ -160,8 +152,8 @@ public class GameScript : MonoBehaviour
 
         if(cyclesCompleted == CYCLE_AMOUNT)
         {
-            //TODO go to win scene
-            Debug.Log("GAME OVER --> WIN");
+            //GAME WIN
+            UnityEngine.SceneManagement.SceneManager.LoadScene("WinEndSccene");
             return;
         }
         GenerateRandomActionButtons();
@@ -205,21 +197,25 @@ public class GameScript : MonoBehaviour
     void GenerateRandomActionButtons()
     {
         int auxIndex = 0;
-        //create one button per each action, randomly selected
-        for (int i = 0; i < maxActions; i++)
-        {
-            auxIndex = UnityEngine.Random.Range(0, maxActions - 1);
+        int auxValue = 0;
+        List<int> auxList = VariablesHelper.actionsAppearences;
 
+
+        //create one button per each action, randomly selected
+        for(int i=0; i < maxActions; i++)
+        {
+
+            auxValue = auxList.Min();
+            auxIndex = auxList.IndexOf(auxValue);
+            auxList[auxIndex] += CYCLE_AMOUNT * 2;
+            //auxIndex = UnityEngine.Random.Range(0, maxActions - 1);
+            Debug.Log(auxValue + " in position " + auxIndex + " of action" + VariablesHelper.actions[auxIndex].description);
             GameObject newButton = GameObject.Instantiate(ActionButtonPrefab);
             newButton.transform.SetParent(GameObject.Find("ChoiceLayout").transform, false);
             newButton.name = "action_" + auxIndex;
             //TODO Store the actionId somewhere in the button object, if possible
-            //TODO Adjust button height to fit all text
             newButton.GetComponentInChildren<Text>().text = VariablesHelper.actions[auxIndex].description + "\n" + VariablesHelper.actions[auxIndex].ActionsToString();
-
-            //TODO find a way to programatically get the height of the button
-            //newButton.GetComponent<RectTransform>().rect.size.y doesn't seem to take the objects scaling
-            //newButton.transform.position = newButton.transform.position + new Vector3(0, 15, 0) + new Vector3(0, i * -65, 0);
+            VariablesHelper.actionsAppearences[auxIndex]++;
         }
     }
 
@@ -229,6 +225,11 @@ public class GameScript : MonoBehaviour
         GamePercentGroup auxGroup;
         Action auxAction;
 
+        VariablesHelper.baseVariables.Clear();
+        VariablesHelper.groupVariables.Clear();
+        VariablesHelper.actions.Clear();
+        VariablesHelper.actionsAppearences.Clear();
+        
         //Indexes for variables
         //CO2 -> 0
         //population -> 1
@@ -241,7 +242,7 @@ public class GameScript : MonoBehaviour
         VariablesHelper.baseVariables.Add(auxVar);
         CO2Index = 0;
 
-        auxVar = new GameVariable("Population", "persons", 500, 5, 4000, 0);
+        auxVar = new GameVariable("Population", "persons", 500, 0.1f, 4000, 0);
         //eat food
         auxVar.AddAction(2, -0.5f);
         auxVar.maxConsequence.isGameOver = false;
@@ -271,11 +272,11 @@ public class GameScript : MonoBehaviour
         VariablesHelper.baseVariables.Add(auxVar);
 
         auxGroup = new GamePercentGroup();
-        auxVar = new GameVariable("City Land", "m2", 10, 400, 100, 0);
+        auxVar = new GameVariable("City Land", "m2", 10, 40, 100, 0);
         auxVar.minConsequence.isGameOver = true;
         auxVar.maxConsequence.isGameOver = true;
         auxGroup.AddToGroup(auxVar);
-        auxVar = new GameVariable("Farming Land", "m2", 30, 600, 100, 0);
+        auxVar = new GameVariable("Farming Land", "m2", 30, 60, 100, 0);
         auxVar.minConsequence.isGameOver = true;
         auxVar.maxConsequence.isGameOver = true;
         auxVar.AddAction(2, 1.0f);
@@ -295,24 +296,29 @@ public class GameScript : MonoBehaviour
         auxAction.AddGroupAction(0, 2, 0, 20);
         auxAction.AddVariableAction(1, 10);
         VariablesHelper.actions.Add(auxAction);
+        VariablesHelper.actionsAppearences.Add(0);
 
         auxAction = new Action("Add farming land");
         auxAction.AddGroupAction(0, 2, 1, 10);
         VariablesHelper.actions.Add(auxAction);
+        VariablesHelper.actionsAppearences.Add(0);
 
         auxAction = new Action("Turn farming land to forest");
         auxAction.AddGroupAction(0, 1, 2, 30);
         VariablesHelper.actions.Add(auxAction);
+        VariablesHelper.actionsAppearences.Add(0);
 
         auxAction = new Action("Increase farming and city land");
         auxAction.AddGroupAction(0, 2, 1, 40);
         auxAction.AddGroupAction(0, 2, 0, 20);
         VariablesHelper.actions.Add(auxAction);
+        VariablesHelper.actionsAppearences.Add(0);
 
         auxAction = new Action("Organize big party on your city");
         auxAction.AddVariableAction(0, 400);
         auxAction.AddVariableAction(3, 20);
         VariablesHelper.actions.Add(auxAction);
+        VariablesHelper.actionsAppearences.Add(0);
 
         //add CO2 cycle Action for all variables
         foreach (GameVariable var in VariablesHelper.baseVariables)

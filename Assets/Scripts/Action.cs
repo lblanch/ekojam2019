@@ -6,6 +6,7 @@ using UnityEngine;
 public class Action
 {
     public string description;
+    public int usage;
     List<Tuple<int,float>> variableActions = new List<Tuple<int,float>>(); //variableId and amount
     List<Tuple<int, int>> groupActions = new List<Tuple<int, int>>(); //sourceId and destinationId
     List<Tuple<int,float>> groupAmounts = new List<Tuple<int,float>>(); //groupId and amount
