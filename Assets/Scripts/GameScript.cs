@@ -223,7 +223,7 @@ public class GameScript : MonoBehaviour
             auxIndex = UnityEngine.Random.Range(0, maxActions - 1);
 
             GameObject newButton = GameObject.Instantiate(ActionButtonPrefab);
-            newButton.transform.SetParent(GameObject.Find("Choices").transform, false);
+            newButton.transform.SetParent(GameObject.Find("ChoiceLayout").transform, false);
             newButton.name = "action_" + auxIndex;
             //TODO Store the actionId somewhere in the button object, if possible
             //TODO Adjust button height to fit all text
@@ -231,7 +231,7 @@ public class GameScript : MonoBehaviour
 
             //TODO find a way to programatically get the height of the button
             //newButton.GetComponent<RectTransform>().rect.size.y doesn't seem to take the objects scaling
-            newButton.transform.position = newButton.transform.position + new Vector3(0, 15, 0) + new Vector3(0, i * -65, 0);
+            //newButton.transform.position = newButton.transform.position + new Vector3(0, 15, 0) + new Vector3(0, i * -65, 0);
         }
     }
 
