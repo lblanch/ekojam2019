@@ -14,17 +14,14 @@ public class GamePercentGroup
 
     public void ChangeValue(float amount, int sourceId, int destinationId)
     {
-        //if(variables[sourceId].value > amount)
-        //{
-            variables[destinationId].ChangeValue(amount, true);
-            variables[sourceId].ChangeValue(-amount, true);
-        //}
+        variables[destinationId].ChangeValue(amount);
+        variables[sourceId].ChangeValue(-amount);
     }
 
     public void SetChangedValues(float amount, int sourceId, int destinationId)
     {
-        variables[sourceId].SetChangedValue(-amount, true);
-        variables[destinationId].SetChangedValue(amount, true);
+        variables[sourceId].SetChangedValue(-amount);
+        variables[destinationId].SetChangedValue(amount);
     }
 
     public float CalculateCO2Total()

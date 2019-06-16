@@ -11,7 +11,7 @@ public class killerrabbittTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameVariable auxVar;
+        /*GameVariable auxVar;
         GamePercentGroup auxGroup;
         Action auxAction;
 
@@ -51,13 +51,13 @@ public class killerrabbittTest : MonoBehaviour
 
         auxAction = new Action("Just randomly increase CO2");
         auxAction.AddVariableAction(0, 4000);
-        actions.Add(auxAction);
+        actions.Add(auxAction);*/
     }
 
 
     void FixedUpdate()
     {
-        textARG.text = "";
+        /*textARG.text = "";
         foreach (GameVariable var in VariablesHelper.baseVariables)
         {
             textARG.text += var.name + " " + var.value + var.unit + "\n";
@@ -66,16 +66,16 @@ public class killerrabbittTest : MonoBehaviour
         {
             foreach (GameVariable varVar in var.variables)
                 textARG.text += varVar.name + " " + varVar.value + varVar.unit + "\n";
-        }
+        }*/
     }
 
     public void OnClickButton()
     {
-        Debug.Log("button pressed ");
+        /*Debug.Log("button pressed ");
         foreach (Action playerAction in actions)
         {
             Debug.Log("Executing: " + playerAction.description);
             playerAction.ExecuteAction();
-        }
+        }*/
     }
 }

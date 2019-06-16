@@ -9,6 +9,7 @@ public class GameScript : MonoBehaviour
     public GameObject ActionButtonPrefab;
     public Text textAllVariables;
     public Text textAllChanges;
+    private bool varValuesAreOk;
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +37,8 @@ public class GameScript : MonoBehaviour
 
     void FixedUpdate()
     {
+        bool auxVarValues = true;
+
         textAllVariables.text = "CURRENT STATS\n\n";
         foreach (GameVariable var in VariablesHelper.baseVariables)
         {
@@ -50,57 +53,48 @@ public class GameScript : MonoBehaviour
         textAllChanges.text = "AFTER CHANGES STATS\n\n";
         foreach (GameVariable var in VariablesHelper.baseVariables)
         {
+            if (!var.IsValueOK())
+            {
+                auxVarValues = false;
+            }
             textAllChanges.text += "- " + var.name + " " + var.changeValue + " " +  var.unit + "\n";
         }
         foreach (GamePercentGroup var in VariablesHelper.groupVariables)
         {
             foreach (GameVariable varVar in var.variables)
+            {
+                if (!varVar.IsValueOK())
+                {
+                    auxVarValues = false;
+                }
                 textAllChanges.text += "- " + varVar.name + " " + varVar.changeValue + " " + varVar.unit + "\n";
+            }
         }
+        varValuesAreOk = auxVarValues;
     }
 
     public void ApplySelectedActions()
     {
         int actionId;
 
-        //This way goes through all toggled buttons and executes their actions in order
-        /*
-        //TODO if changedValue is negative or not acceptable, show message and cancel this action
-        GameObject.Find("Choices").GetComponentInChildren<Button>(false);
-        foreach (Button actionButton in GameObject.Find("Choices").GetComponentsInChildren<Button>(false))
+        if(varValuesAreOk)
         {
-            if(actionButton.GetComponentInChildren<ToggleButton>().IsToggled())
-            {
-                actionId = int.Parse(actionButton.transform.name.Substring(7));
-                VariablesHelper.actions[actionId].ExecuteAction();
-            }
-        }*/
-
-        //TODO THIS BELOW IS WRONG: IF THE VARIABLE WITH THE WRONG AMOUNT IS THE LAST ONE, THE PREVIOUS CHANGES ARE NOT UNDONE!
-        //In this way we go through all our variables and simply take the already calculated value as current
-        foreach (GameVariable var in VariablesHelper.baseVariables)
-        {
-            if(!var.UpdateCurrentValue())
-            {
-                //TODO show this message to the user in a pop up window or something
-                Debug.Log(var.name + " With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
-                return;
-            }
+            //TODO show this message to the user in a pop up window or something
+            Debug.Log(" With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
+            return;
         }
-        foreach (GamePercentGroup var in VariablesHelper.groupVariables)
+        else
         {
-            foreach (GameVariable varVar in var.variables)
+            GameObject.Find("Choices").GetComponentInChildren<Button>(false);
+            foreach (Button actionButton in GameObject.Find("Choices").GetComponentsInChildren<Button>(false))
             {
-                if (!varVar.UpdateCurrentValue(true))
+                if (actionButton.GetComponentInChildren<ToggleButton>().IsToggled())
                 {
-                    //TODO show this message to the user in a pop up window or something
-                    Debug.Log(varVar.name + "With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
-                    return;
+                    actionId = int.Parse(actionButton.transform.name.Substring(7));
+                    VariablesHelper.actions[actionId].ExecuteAction();
                 }
-
             }
         }
-
     }
 
     void LoadData()
@@ -109,19 +103,23 @@ public class GameScript : MonoBehaviour
         GamePercentGroup auxGroup;
         Action auxAction;
 
-        auxVar = new GameVariable("CO2", "kilotons", 2000, 0);
+        auxVar = new GameVariable("CO2", "kilotons", 2000, 0, 500000, -500000);
         VariablesHelper.baseVariables.Add(auxVar);
-        auxVar = new GameVariable("Population", "persons", 500, 200);
+        auxVar = new GameVariable("Population", "persons", 500, 200, 4000, 0);
         VariablesHelper.baseVariables.Add(auxVar);
-        auxVar = new GameVariable("Food", "kg", 60000, 0);
+        auxVar = new GameVariable("Food", "kg", 5000, 0, 6000, 2000);
+        VariablesHelper.baseVariables.Add(auxVar);
+        auxVar = new GameVariable("Happiness", "%", 60, 0, 100, 0);
         VariablesHelper.baseVariables.Add(auxVar);
 
         auxGroup = new GamePercentGroup();
-        auxVar = new GameVariable("City Land", "m2", 30, 400, 1, 100);
+        auxVar = new GameVariable("City Land", "m2", 10, 400, 100, 0);
         auxGroup.AddToGroup(auxVar);
-        auxVar = new GameVariable("Farming Land", "m2", 30, 600, 1, 100);
+        auxVar = new GameVariable("Farming Land", "m2", 30, 600, 100, 0);
         auxGroup.AddToGroup(auxVar);
-        auxVar = new GameVariable("Forest", "m2", 40, -2000, 1, 100);
+        auxVar = new GameVariable("Forest", "m2", 40, -2000, 100, 0);
+        auxGroup.AddToGroup(auxVar);
+        auxVar = new GameVariable("Sea", "m2", 20, 0, 100, 0);
         auxGroup.AddToGroup(auxVar);
         VariablesHelper.groupVariables.Add(auxGroup);
 
@@ -143,8 +141,9 @@ public class GameScript : MonoBehaviour
         auxAction.AddGroupAction(0, 2, 0, 20);
         VariablesHelper.actions.Add(auxAction);
 
-        auxAction = new Action("Just randomly increase CO2");
-        auxAction.AddVariableAction(0, 4000);
+        auxAction = new Action("Organize big party on your city");
+        auxAction.AddVariableAction(0, 400);
+        auxAction.AddVariableAction(3, 20);
         VariablesHelper.actions.Add(auxAction);
     }
 }

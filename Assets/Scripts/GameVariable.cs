@@ -9,21 +9,21 @@ public class GameVariable
     public float value;
     public float CO2Emission;
     public float scalingFactor;
+    public float minValue;
     public float maxValue;
     public float changeValue;
     public List<Action> actions;
 
-
-    public GameVariable(string _name, string _unit, float _value, float _CO2Emission, float _scalingFactor = 1, float _maxValue = 0) 
+    public GameVariable(string _name, string _unit, float _value, float _CO2Emission, float _maxValue, float _minValue, float _scalingFactor = 1) 
     {
         name = _name;
         unit = _unit;
         value = _value;
         CO2Emission = _CO2Emission;
-        scalingFactor = _scalingFactor;
         maxValue = _maxValue;
+        minValue = _minValue;
+        scalingFactor = _scalingFactor;
         changeValue = _value;
-
     }
 
     public float CalculateCO2()
@@ -31,47 +31,39 @@ public class GameVariable
         return value * CO2Emission * scalingFactor;
     }
 
-    public void ChangeValue(float amount, bool checkMax = false)
+    public void ChangeValue(float amount, float amountChange = 0)
     {
-        /*if(checkMax)
-        {
-            if ((value+amount) > maxValue) 
-            {
-                return;
-            }
-        }*/
         value += amount;
+        changeValue = amountChange;
     }
 
-    public void SetChangedValue(float amount, bool checkMax = false)
+    public void SetChangedValue(float amount)
     {
         changeValue += amount;
     }
 
-    public bool UpdateCurrentValue(bool checkMax = false)
+    public void SetChangedValueAsCurrent()
     {
-        if (changeValue > 0)
+        value = changeValue;
+        changeValue = 0;
+    }
+
+    public bool IsValueOK()
+    {
+        if (changeValue < minValue)
         {
-            if (checkMax)
+            return false;
+        }
+        else
+        {
+            if (changeValue > maxValue)
             {
-                if(changeValue > maxValue)
-                {
-                    return false;
-                }
-                else
-                {
-                    value = changeValue;
-                    changeValue = 0;
-                    return true;
-                }
+                return false;
             }
             else
             {
-                value = changeValue;
-                changeValue = 0;
                 return true;
             }
         }
-        return false;
     }
 }
