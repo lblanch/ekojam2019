@@ -12,6 +12,8 @@ public class GameVariable
     public float scalingFactor;
     public float minValue;
     public float maxValue;
+    public Consequence minConsequence;
+    public Consequence maxConsequence;
     public float changeValue;
     public List<Tuple<int, float>> actionsArgs;
 
@@ -26,6 +28,8 @@ public class GameVariable
         scalingFactor = _scalingFactor;
         changeValue = _value;
         actionsArgs = new List<Tuple<int, float>>();
+        minConsequence = new Consequence();
+        maxConsequence = new Consequence();
     }
 
     public void AddAction(int destinationVar, float multiplyingFactor)
@@ -40,7 +44,7 @@ public class GameVariable
         Action aux;
         foreach(Tuple<int, float> tupleInfo in actionsArgs)
         {
-            aux = new Action("Population action");
+            aux = new Action(name + " action");
             aux.AddVariableAction(tupleInfo.Item1, (tupleInfo.Item2 * value));
             aux.ExecuteAction();
             resultStr += aux.ActionsToString();
@@ -57,7 +61,7 @@ public class GameVariable
     public void ChangeValue(float amount, float amountChange = 0)
     {
         value += amount;
-        changeValue = amountChange;
+        changeValue = value;
     }
 
     public void SetChangedValue(float amount)
@@ -68,7 +72,7 @@ public class GameVariable
     public void SetChangedValueAsCurrent()
     {
         value = changeValue;
-        changeValue = 0;
+        changeValue = value;
     }
 
     public bool IsValueOK()

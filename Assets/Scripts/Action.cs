@@ -58,13 +58,13 @@ public class Action
 
         foreach (Tuple<int, float> actionVar in variableActions)
         {
-            returnStr += VariablesHelper.baseVariables[actionVar.Item1].name + ": +" + actionVar.Item2 + "\n";
+            returnStr += VariablesHelper.baseVariables[actionVar.Item1].name + ": " + actionVar.Item2.ToString("+0;-#") + " | ";
         }
 
         for (int i = 0; i < groupActions.Count; i++)
         {
-            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item1].name + ": -" + groupAmounts[i].Item2 + "\n";
-            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item2].name + ": +" + groupAmounts[i].Item2 + "\n";
+            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item1].name + ": " + (-1 * groupAmounts[i].Item2).ToString("+0;-#") + " | ";
+            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item2].name + ": " + groupAmounts[i].Item2.ToString("+0;-#") + " | ";
 
         }
         return returnStr;
