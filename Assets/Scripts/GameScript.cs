@@ -105,30 +105,16 @@ public class GameScript : MonoBehaviour
         //execute all actions of our variables
         foreach (GameVariable var in VariablesHelper.baseVariables)
         {
-            cycleActions += var.ExecuteVarActions();
+            cycleActions += var.name + " generated: " + var.ExecuteVarActions() + "\n";
         }
         foreach (GamePercentGroup var in VariablesHelper.groupVariables)
         {
             foreach (GameVariable varVar in var.variables)
             {
-                cycleActions += varVar.ExecuteVarActions();
+                cycleActions += varVar.name + " generated: " + varVar.ExecuteVarActions()+ "\n";
             }
         }
         Debug.Log(cycleActions);
-
-        //TODO generate CO2
-        //TODO CO2 generation could be a cycleAction
-        foreach (GameVariable var in VariablesHelper.baseVariables)
-        {
-            cycleActions += var.name + " generated: " + var.ExecuteVarActions();
-        }
-        foreach (GamePercentGroup var in VariablesHelper.groupVariables)
-        {
-            foreach (GameVariable varVar in var.variables)
-            {
-                cycleActions += varVar.name + " generated: " + varVar.ExecuteVarActions();
-            }
-        }
 
         //TODO update max and min values
 
@@ -140,7 +126,8 @@ public class GameScript : MonoBehaviour
             {
                 //GAME OVER
                 //TODO to to game over scene
-                Debug.Log(auxTuple.Item2);
+                VariablesHelper.gameOver = auxTuple.Item2;
+                UnityEngine.SceneManagement.SceneManager.LoadScene("LoosEndSccene");
                 return;
             }
             else
@@ -157,7 +144,8 @@ public class GameScript : MonoBehaviour
                 {
                     //GAME OVER
                     //TODO to to game over scene
-                    Debug.Log(auxTuple.Item2);
+                    VariablesHelper.gameOver = auxTuple.Item2;
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("LoosEndSccene");
                     return;
                 }
                 else
@@ -253,7 +241,7 @@ public class GameScript : MonoBehaviour
         VariablesHelper.baseVariables.Add(auxVar);
         CO2Index = 0;
 
-        auxVar = new GameVariable("Population", "persons", 500, 200, 4000, 0);
+        auxVar = new GameVariable("Population", "persons", 500, 5, 4000, 0);
         //eat food
         auxVar.AddAction(2, -0.5f);
         auxVar.maxConsequence.isGameOver = false;
