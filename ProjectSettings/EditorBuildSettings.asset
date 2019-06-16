@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 6857538e86862d64b84e3456aa3d6cc8
+  - enabled: 1
+    path: Assets/Scenes/LoosEndSccene.unity
+    guid: 8cbc572be63ec114a9c5557f30fbd0ad
+  - enabled: 1
+    path: Assets/Scenes/WinEndSccene.unity
+    guid: cdfc78330e77c7e4a8aaae2eb21afa72
   m_configObjects: {}
