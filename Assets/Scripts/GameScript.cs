@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class GameScript : MonoBehaviour
 {
+    const int ACTIONS_PER_CYCLE = 3;
+    const int CYCLE_AMOUNT = 5;
 
     public GameObject ActionButtonPrefab;
     public Text textAllVariables;
@@ -14,24 +16,16 @@ public class GameScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        int maxActions = ACTIONS_PER_CYCLE;
+
         LoadData();
 
-        //create one button per each action
-        //TODO create only fixed amount of buttons, according to what fits in screen
-        //TODO choose what actions we show
-        for (int i=0; i<VariablesHelper.actions.Count; i++)
+        if (maxActions > VariablesHelper.actions.Count)
         {
-            GameObject newButton = GameObject.Instantiate(ActionButtonPrefab);
-            newButton.transform.SetParent(GameObject.Find("Choices").transform, false);
-            newButton.name = "action_"+i;
-            //TODO Store the actionId somewhere in the button object, if possible
-            //TODO Adjust button height to fit all text
-            newButton.GetComponentInChildren<Text>().text = VariablesHelper.actions[i].description + "\n" + VariablesHelper.actions[i].ActionsToString();
-
-            //TODO find a way to programatically get the height of the button
-            //newButton.GetComponent<RectTransform>().rect.size.y doesn't seem to take the objects scaling
-            newButton.transform.position = newButton.transform.position + new Vector3(0, i * 60, 0);
+            maxActions = VariablesHelper.actions.Count;
         }
+
+        GenerateRandomActionButtons(maxActions);
     }
 
 
@@ -70,30 +64,60 @@ public class GameScript : MonoBehaviour
                 textAllChanges.text += "- " + varVar.name + " " + varVar.changeValue + " " + varVar.unit + "\n";
             }
         }
+
         varValuesAreOk = auxVarValues;
+        textAllChanges.text += "\n values ok? " + varValuesAreOk;
     }
 
     public void ApplySelectedActions()
     {
         int actionId;
 
-        if(varValuesAreOk)
+        if(!varValuesAreOk)
         {
             //TODO show this message to the user in a pop up window or something
             Debug.Log(" With the current combination of actions, some of the stats have a wrong value. Please choose differently!");
             return;
         }
-        else
+       
+        //execute all actions
+        //TODO delete the buttons already here?
+        GameObject.Find("Choices").GetComponentInChildren<Button>(false);
+        foreach (Button actionButton in GameObject.Find("Choices").GetComponentsInChildren<Button>(false))
         {
-            GameObject.Find("Choices").GetComponentInChildren<Button>(false);
-            foreach (Button actionButton in GameObject.Find("Choices").GetComponentsInChildren<Button>(false))
+            if (actionButton.GetComponentInChildren<ToggleButton>().IsToggled())
             {
-                if (actionButton.GetComponentInChildren<ToggleButton>().IsToggled())
-                {
-                    actionId = int.Parse(actionButton.transform.name.Substring(7));
-                    VariablesHelper.actions[actionId].ExecuteAction();
-                }
+                actionId = int.Parse(actionButton.transform.name.Substring(7));
+                VariablesHelper.actions[actionId].ExecuteAction();
             }
+        }
+
+        //TODO execute all actions of our variables
+
+        //TODO check end game conditions
+
+        //TODO delete current action buttons and generate new ones
+
+    }
+
+    void GenerateRandomActionButtons(int maxActions)
+    {
+        int auxIndex = 0;
+        //create one button per each action, randomly selected
+        for (int i = 0; i < maxActions; i++)
+        {
+            auxIndex = Random.Range(0, maxActions - 1);
+
+            GameObject newButton = GameObject.Instantiate(ActionButtonPrefab);
+            newButton.transform.SetParent(GameObject.Find("Choices").transform, false);
+            newButton.name = "action_" + auxIndex;
+            //TODO Store the actionId somewhere in the button object, if possible
+            //TODO Adjust button height to fit all text
+            newButton.GetComponentInChildren<Text>().text = VariablesHelper.actions[auxIndex].description + "\n" + VariablesHelper.actions[auxIndex].ActionsToString();
+
+            //TODO find a way to programatically get the height of the button
+            //newButton.GetComponent<RectTransform>().rect.size.y doesn't seem to take the objects scaling
+            newButton.transform.position = newButton.transform.position + new Vector3(0, 15, 0) + new Vector3(0, i * -65, 0);
         }
     }
 
