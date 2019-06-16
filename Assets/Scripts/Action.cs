@@ -63,8 +63,8 @@ public class Action
 
         for (int i = 0; i < groupActions.Count; i++)
         {
-            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item1].name + ": +" + groupAmounts[i].Item2 + "\n";
-            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item2].name + ": -" + groupAmounts[i].Item2 + "\n";
+            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item1].name + ": -" + groupAmounts[i].Item2 + "\n";
+            returnStr += VariablesHelper.groupVariables[groupAmounts[i].Item1].variables[groupActions[i].Item2].name + ": +" + groupAmounts[i].Item2 + "\n";
 
         }
         return returnStr;

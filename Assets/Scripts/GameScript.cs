@@ -94,6 +94,7 @@ public class GameScript : MonoBehaviour
 
         //TODO execute all actions of our variables
 
+
         //TODO check end game conditions
 
         //TODO delete current action buttons and generate new ones
@@ -127,9 +128,16 @@ public class GameScript : MonoBehaviour
         GamePercentGroup auxGroup;
         Action auxAction;
 
+        //Indexes for variables
+        //CO2 -> 0
+        //population -> 1
+        //food -> 2
+        //happiness -> 3
+
         auxVar = new GameVariable("CO2", "kilotons", 2000, 0, 500000, -500000);
         VariablesHelper.baseVariables.Add(auxVar);
         auxVar = new GameVariable("Population", "persons", 500, 200, 4000, 0);
+        auxVar.AddAction(2, 0.5f);
         VariablesHelper.baseVariables.Add(auxVar);
         auxVar = new GameVariable("Food", "kg", 5000, 0, 6000, 2000);
         VariablesHelper.baseVariables.Add(auxVar);
